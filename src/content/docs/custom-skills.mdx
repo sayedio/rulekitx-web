@@ -1,0 +1,78 @@
+---
+title: Custom Skills
+description: Learn how to author and distribute custom, project-specific RuleKitX skills to enforce your own guidelines.
+order: 6
+---
+
+# Custom Skills
+
+RuleKitX is built on a dynamic markdown discovery system. While the package comes with 9 carefully crafted domain skills, you are free to add your own.
+
+Custom skills are useful when you need to enforce team-specific logic, such as a strict internal API policy, custom design system naming, or unique database transaction requirements.
+
+---
+
+## 1. Creating a Skill File
+
+All RuleKitX skills are plain Markdown files with YAML frontmatter.
+
+To create a new skill:
+1. Navigate to your RuleKitX config directory (e.g., `~/.rulekitx/` for global or `./.rulekitx/` for local).
+2. Inside the `skills/` directory, place your markdown file inside any category subfolder (e.g., `skills/custom/my-rules.md`). The name of the file becomes the command name.
+
+### File Format
+
+Your file **must** contain valid YAML frontmatter with `name` and `description` keys. The description is used for IDE autocomplete hints and Cursor Agent-Requested descriptions.
+
+```markdown
+---
+name: my-skill
+description: Custom team rules for database migrations.
+---
+
+# /rulekitx-my-skill
+
+When modifying the database schema:
+1. Never use cascading deletes.
+2. Always write a rollback script in the `migrations/down/` folder.
+3. Assert that no tables are locked during the transaction.
+```
+
+## 2. Syncing Your Skill
+
+Once you save the file, you must tell RuleKitX to synchronize the new skill with your IDEs and agents.
+
+Run the sync command:
+
+```bash
+rulekitx install-ide
+```
+
+You can verify the skill is recognized by running:
+
+```bash
+rulekitx list
+```
+
+Your command will appear as `/rulekitx-my-skill` under the `CUSTOM` category.
+
+---
+
+## 3. How It Loads
+
+RuleKitX delivers your custom skill using the same dynamic system as bundled skills:
+
+*   **Cursor:** Generated as an Agent-Requested `.mdc` file in `.cursor/rules/rulekitx-my-skill.mdc`. Cursor will automatically read the description and only pull the full rules in when it believes they are relevant to your prompt.
+*   **OpenCode & Claude Code:** Placed in their native skill folders as `SKILL.md` files. They will appear in the `npx skills` menu automatically.
+*   **VS Code & JetBrains:** Added as a live-template/snippet. Typing `/rulekitx-my-skill` will expand it into the editor.
+
+---
+
+## ⚠️ Important Caveat: Pruning
+
+The `rulekitx init` command is designed to scaffold the default bundled skills. To keep the installation clean, running `rulekitx init` **will prune (delete) any markdown files in the `skills/` directory that are not part of the official RuleKitX release.**
+
+If you create custom skills:
+1. Do not run `rulekitx init` again unless you intend to reset your setup.
+2. If you do run `rulekitx init`, back up your custom skills first.
+3. Use `rulekitx install-ide` instead of `init` to update or sync your custom files.

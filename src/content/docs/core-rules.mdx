@@ -1,0 +1,95 @@
+---
+title: Core Memory (Layer 1)
+description: Learn about Core Memory, the foundational reasoning and safety kernel loaded unconditionally with every RuleKitX execution.
+order: 2
+---
+
+# Core Memory (Layer 1)
+
+Every activated skill in RuleKitX is unconditionally paired with a foundational system layer defined in `core.md`, known as **Core Memory**. 
+
+While individual skills focus on specific domains (like designing architectures, writing tests, or structuring code), **Core Memory** defines the universal reasoning, security, and safety floor that applies to *all* workflows.
+
+---
+
+## Decision Priority
+
+When resolving conflicts or deciding how to implement logic, the AI must strictly apply the following hierarchy in order. Lower levels never override higher ones:
+
+1. **Correctness** — Does the implementation verifiably work?
+2. **Safety** — Does it preserve existing behaviors and avoid regressions?
+3. **Security** — Does it meet the established security baseline?
+4. **Clarity** — Is the code readable and self-documenting?
+5. **Simplicity** — Is it the least complex solution satisfying all requirements?
+6. **Performance** — Has it been optimized (only after levels 1-5 pass)?
+7. **Style** — Does it match project naming conventions (never overrides safety or correctness)?
+
+---
+
+## Verify First Protocol
+
+Before writing any implementation code, RuleKitX requires AI agents to verify their environment:
+
+*   **Source of Truth:** Treat the installed codebase and its lock files as the source of truth — never guess APIs from general memory, training data, or blog posts.
+*   **Version Check:** Verify APIs, signatures, and config keys against the installed version before using them.
+*   **Transparency:** Declare what is confirmed, what is assumed, and what is unknown before writing code.
+
+---
+
+## Warn First, Stop Only If Critical
+
+Rather than halting at any unknown factor, RuleKitX enforces a softened warning system:
+
+*   **Warn and Proceed:** If an unverified factor is non-critical, warn and proceed using a labelled, explicit assumption.
+*   **Hard Stop:** Halt and report immediately only if proceeding could be destructive or unsafe:
+    *   Data loss, irreversible database migrations, or deleting code that may still be reachable.
+    *   A security boundary or authorization contract cannot be verified.
+    *   A version conflict that would silently break existing behavior.
+
+```
+⚠️ Assumption: [what + why]    →  continue
+⛔ Blocked: [critical reason]   →  stop and report
+```
+
+---
+
+## Modify Safely Principles
+
+RuleKitX forces strict safety discipline when changing existing code:
+
+*   **Minimal Diff:** Make the smallest change that satisfies the task. Never reformat unrelated sections or change adjacent code.
+*   **One Concern:** Never bundle refactoring, bug fixes, and feature additions in a single change.
+*   **Add Before Replacing:** Add the new interface first, verify it works, then safely deprecate or delete the old code.
+*   **Audit Call Sites:** Audit all dependent callers before changing a public function or interface signature.
+*   **Confirm Unreachability:** Never delete code unless it is confirmed to be unused and unreachable.
+
+---
+
+## Universal Security Baseline
+
+RuleKitX establishes strict security defaults. AI models must adhere to these unconditionally:
+
+*   **Untrusted Inputs:** Treat all external inputs as completely untrusted (user input, environment variables, files, query parameters, API responses).
+*   **Trust Boundaries:** Validate and sanitize all inputs at the boundary before passing them downstream.
+*   **No Concatenation:** Never concatenate untrusted variables into database queries, terminal execution strings, HTML templates, or shell scripts.
+*   **Secret Hygiene:** Never hardcode API keys, passwords, tokens, or credentials. Use secure environment or secret managers only.
+*   **Safe Escaping:** Properly escape all output according to its exact context (HTML, SQL, shell, JSON, URL are each treated as distinct).
+
+---
+
+## Execution Principle
+
+*   **Respect Patterns:** Prefer existing project patterns over inventing new ones.
+*   **Evidence-First Architecture:** Do not introduce layers of abstraction or architecture without clear evidence they are needed.
+
+---
+
+## Absolute Forbidden (Hard Stops)
+
+The following behaviors represent hard boundaries. No exceptions are permitted:
+
+*   ❌ Hardcoding any secret, key, token, or credential.
+*   ❌ Concatenating untrusted input into queries, commands, or markup.
+*   ❌ Deleting code without confirming it is unreachable and unused.
+*   ❌ Treating an assumption as a confirmed fact in output.
+*   ❌ Executing any remote Git push, merge, rebase, or destructive commands without explicit, written permission from the user in the current conversation turn.

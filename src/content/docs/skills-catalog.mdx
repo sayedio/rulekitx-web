@@ -1,0 +1,77 @@
+---
+title: Skills Catalog (Layer 2)
+description: Explore the complete catalog of 9 domain skills included with RuleKitX, restructured into decoupled, zero-overlap specialist layers.
+order: 3
+---
+
+# Domain Skills (Layer 2)
+
+RuleKitX comes bundled with 9 highly detailed engineering, design, and standards skills. To prevent token waste and cognitive overlap, every skill has been restructured to focus strictly on **exactly one concern**. They inherit Core Memory safety baselines and work as pluggable, context-selected specialist layers.
+
+---
+
+## 🏗️ Engineering Skills
+
+### Safe Feature (`/rulekitx-safe-feature`)
+**Primary Concern:** Planning and de-risking new features before any code is written.
+*   **Planning-Only:** Scope is restricted to mapping feature contracts, dependent caller analysis, rollback strategies, and risk assessments.
+*   **Feature Contracts:** Mandates setting up input/output boundaries and failure expectations.
+*   **Caller Analysis:** Verifies no adjacent interfaces or callers are impacted.
+*   *Defers runtime execution discipline to `/rulekitx-exec-complete` and refactoring to `/rulekitx-refactor`.*
+
+### Exec Complete (`/rulekitx-exec-complete`)
+**Primary Concern:** Robust implementation, wiring, and runtime protection.
+*   **Implementation Discipline:** Turns planned features into production-deployable code with strict zero-placeholder guarantees (no TODOs or stubs).
+*   **Runtime Defense:** Enforces strict validation parameters, structured logging, configuration file validations, network call timeouts, and idempotent retries.
+*   *Defers planning, caller risk, and rollback strategy to `/rulekitx-safe-feature`.*
+
+### Reviewer (`/rulekitx-reviewer`)
+**Primary Concern:** Read-only code auditing for production risk.
+*   **Strictly Read-Only:** Audits the diff or file for security boundaries, correctness (race conditions, async gaps, null handling), and contract drift without rewriting the code.
+*   **Classification:** Groups findings into Critical, Major, Minor, and Suggestion logs.
+*   *Inherits the core security baseline instead of duplicating it; defers actual refactoring to `/rulekitx-refactor`.*
+
+### Refactor (`/rulekitx-refactor`)
+**Primary Concern:** Structuring existing code for maintainability without changing observable behavior.
+*   **Fowler Operations:** Plans and commits one named Fowler operation (e.g. Extract Method, Inline Method, Move Function) at a time.
+*   **Hard Preconditions:** Requires comprehensive test coverage to verify zero behavior drift.
+*   **Emergency Override:** Permits hot-fixing without prior tests *only* if the override is declared explicitly and tests are added immediately after.
+
+---
+
+## 🎨 Design Skills
+
+### Premium UI (`/rulekitx-premium-ui`)
+**Primary Concern:** Building highly accessible, production-grade visual components.
+*   **Design Token Respect:** Inherits spacing, colors, typography, and scales from the project's existing design system instead of forcing defaults.
+*   **Complete States:** Handles all UI states (loading, empty, success, error, disabled) programmatically.
+*   **Accessibility (WCAG AA):** Enforces keyboard focus indicators, touch targets ≥ 44px, contrast ratios, and accessible names.
+*   *Domain-Invoked Only: Never loaded for backend, API, or system tasks.*
+
+### Redesign (`/rulekitx-redesign`)
+**Primary Concern:** Evolves existing interface layouts without breaking user mental models.
+*   **Audit-First:** Inspects existing components for visual debt, friction, and inconsistencies before writing code.
+*   **Workflow Preservation:** Locks down navigation structures, core terminologies, and primary action locations to protect muscle memory.
+*   *Defers net-new component standards to `/rulekitx-premium-ui` and database/system structuring to `/rulekitx-architect`.*
+
+### Architect (`/rulekitx-architect`)
+**Primary Concern:** System layering, module dependencies, and boundaries.
+*   **Grounded Analysis:** Mandates analyzing the existing codebase first and prioritizing incremental evolution over risky greenfield speculation.
+*   **Downwards Dependencies:** Enforces strict modular boundaries and single-direction dependency directions.
+*   *Defers UI, layout, and visual redesign to `/rulekitx-redesign` and `/rulekitx-premium-ui`.*
+
+---
+
+## ⚡ Standards & Contracts
+
+### API Standard (`/rulekitx-api`)
+**Primary Concern:** HTTP API contracts and consistency.
+*   **REST Semantics:** Directs RESTful resources (nouns over verbs), status codes, consistent envelopes, and stable error shapes.
+*   **API Stability:** Governs pagination schemas, versioning (URL-based), and API deprecation periods.
+*   *Defers general signature verification to Core Memory; shares contract reviews with `/rulekitx-reviewer`.*
+
+### Testing Standard (`/rulekitx-testing`)
+**Primary Concern:** Sane test pyramids and behavior-first assertions.
+*   **Behavior Over Structure:** Asserts on inputs and state outcomes, never on private implementation details.
+*   **Structured Patterns:** Enforces Arrange-Act-Assert blocks and readable naming styles (`[unit] [behavior] when [condition]`).
+*   **Snapshot Allowance:** Permits UI snapshot testing in modern frameworks as an reviewed exception.

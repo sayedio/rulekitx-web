@@ -1,0 +1,132 @@
+---
+title: Getting Started
+description: Learn how to install, configure, and initialize RuleKitX on your machine or inside local repositories.
+order: 1
+---
+
+# Getting Started
+
+RuleKitX is a 3-layer prompt governance system. By defining standard guidelines as clean Markdown templates with YAML metadata, RuleKitX allows you to dynamically compose structured, priority-marked XML system prompts for any AI coding tool, ensuring absolute compliance with your guidelines.
+
+---
+
+## Installation
+
+Install the CLI globally on your machine using NPM:
+
+```bash
+npm install -g rulekitx
+```
+
+### Verification
+
+Ensure the global `rulekitx` command is on your PATH:
+
+```bash
+rulekitx --version
+```
+
+If it succeeds, run `rulekitx doctor` to inspect the status of your RuleKitX configuration:
+
+```bash
+rulekitx doctor
+```
+
+---
+
+## Global Rules Configuration
+
+Upon installation, RuleKitX automatically runs a postinstall script that creates a configuration directory in your user home directory to store active templates (`rulekitx init`).
+
+This creates the following directory structure inside `~/.rulekitx/`:
+
+```
+~/.rulekitx/
+├── core.md
+└── skills/
+    ├── engineering/
+    │   ├── architect.md
+    │   ├── refactor.md
+    │   ├── reviewer.md
+    │   └── safe-feature.md
+    ├── design/
+    │   ├── premium-ui.md
+    │   └── redesign.md
+    ├── execution/
+    │   └── exec-complete.md
+    └── standards/
+        ├── api.md
+        └── testing.md
+```
+
+*(Note: If the automatic initialization fails, or if you want to reset your templates to the default state, you can run `rulekitx init` manually.)*
+
+Additionally, `rulekitx init` triggers global IDE synchronization:
+- Generates autocomplete snippets for **VS Code**, **Cursor**, and **JetBrains**.
+- Automatically copies and registers active skills in **OpenCode** and **Claude Code** agents!
+- Injects a managed, always-on core block into Claude/OpenCode always-loaded files.
+
+---
+
+## Project-Local Rules (Layered Auto-Read)
+
+To configure project-specific rules, auto-detect your stack, and enable **Cursor native background auto-read**, run inside your project root:
+
+```bash
+rulekitx init --local
+```
+
+This local initialization sets up Layer 3 Project Memory and exports the layers cleanly to prevent AI model confusion or context waste:
+
+1.  **Project Memory (`.rulekitx/project-memory.md`):** RuleKitX scans your `package.json`, lockfile, and configurations to auto-detect your languages (TypeScript/JS), framework (Next.js, React, Svelte, etc.), styling systems, and testing setups. It structures these into a local memory file with helpful placeholders.
+2.  **Cursor Rules (`.cursor/rules/`):** Auto-generates Cursor `.mdc` rules matched to their layer:
+    *   `rulekitx-core.mdc` and `rulekitx-project-memory.mdc` are set with `alwaysApply: true` so the AI is always grounded in core safety and stack conventions.
+    *   Domain skills (`rulekitx-api.mdc`, `rulekitx-premium-ui.mdc`, etc.) are written as description-only so they function as **Agent Requested** rules, loading strictly on-demand.
+3.  **Claude Code & OpenCode:** Injects a marker-delimited managed block (Core floor + Project Memory) into local `CLAUDE.md` and `AGENTS.md` files.
+
+### Refreshing Project Memory
+
+If you add new dependencies or styling packages, you can regenerate the local stack summary without overriding your manual documentation by running:
+
+```bash
+rulekitx memory
+```
+
+*(Pass `--force` to completely overwrite and start fresh).*
+
+---
+
+## Direct CLI Usage
+
+You can also use RuleKitX programmatically or via direct CLI outputs to pipe composed system prompts to standard LLM clients:
+
+*   **Parse a prompt for command skills:**
+    ```bash
+    rulekitx parse "/rulekitx-architect build a new feature"
+    ```
+
+*   **Compose the full XML-wrapped system prompt:**
+    ```bash
+    rulekitx compose "/rulekitx-architect /rulekitx-reviewer build user login"
+    ```
+
+*   **Re-sync IDE integrations:**
+    ```bash
+    rulekitx install-ide
+    ```
+
+*   **Uninstall RuleKitX rules and IDE integrations:**
+    ```bash
+    rulekitx uninstall
+    ```
+
+For a comprehensive breakdown of all available CLI commands, see the [CLI Reference](/docs/cli-reference).
+
+---
+
+## Next Steps
+
+Now that you have RuleKitX initialized, you might want to:
+- Learn about the [Core Rules](/docs/core-rules) that govern all RuleKitX tasks.
+- Explore the [Skills Catalog](/docs/skills-catalog) to see what `/rulekitx-*` commands are available.
+- Create your own project-specific rules via [Custom Skills](/docs/custom-skills).

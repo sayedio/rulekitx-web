@@ -1,0 +1,127 @@
+---
+title: CLI Reference
+description: Complete reference for all RuleKitX CLI commands, flags, and expected outputs.
+order: 5
+---
+
+# CLI Reference
+
+The RuleKitX CLI manages the configuration and syncing of all prompt governance rules.
+
+## Commands Overview
+
+| Command | Description |
+|---|---|
+| `rulekitx init` | Scaffold global rules to `~/.rulekitx/` (use `--local` for project-level) |
+| `rulekitx memory` | Generate or refresh `.rulekitx/project-memory.md` from the detected stack |
+| `rulekitx install-ide` | Re-sync IDE snippets and agent skills globally |
+| `rulekitx uninstall` | Remove all RuleKitX files, snippets, and lock entries |
+| `rulekitx list` | List all available `/rulekitx-*` skills |
+| `rulekitx parse "<prompt>"` | Show which skills a prompt invokes |
+| `rulekitx compose "<prompt>"`| Output the full XML-wrapped prompt context |
+| `rulekitx doctor` | Check RuleKitX installation health and configured layers |
+| `rulekitx completions` | Output commands as JSON for IDE extension consumption |
+
+---
+
+## Configuration Commands
+
+### `init`
+Scaffolds the RuleKitX configuration directory and bundled rules. Run this once after installation.
+
+```bash
+rulekitx init
+```
+
+**Options:**
+*   `-l, --local`: Initialize rules locally in the current project (`./.rulekitx/`) and generate Project Memory.
+
+### `memory`
+Analyzes your `package.json`, lockfiles, and configuration files to build a local `project-memory.md` file.
+
+```bash
+rulekitx memory
+```
+
+**Options:**
+*   `-f, --force`: Overwrite the existing `project-memory.md`, discarding any manual edits.
+
+### `install-ide`
+Synchronizes the skills present in your `.rulekitx/` folder with your installed IDEs and agent configurations (VS Code, JetBrains, Cursor, Claude Code, OpenCode). Run this after adding [Custom Skills](/docs/custom-skills).
+
+```bash
+rulekitx install-ide
+```
+
+### `uninstall`
+Safely removes RuleKitX configurations, agent skills, lock file entries, and snippets from your system.
+
+```bash
+rulekitx uninstall
+```
+
+**Options:**
+*   `-l, --local`: Uninstall local rules (`./.rulekitx/`) from the current project instead.
+*   `-y, --yes`: Skip the confirmation prompt.
+
+---
+
+## Utility Commands
+
+### `doctor`
+Inspects your environment and verifies that all 3 layers are correctly configured.
+
+```bash
+rulekitx doctor
+```
+
+**Expected Output:**
+```
+RuleKitX Doctor
+
+  Directory: C:\Users\user\.rulekitx (global)
+
+  Layer 1 — Core Memory (always-on)
+    ✓ core.md
+
+  Layer 2 — Domain Skills (on-demand)
+    ✓ 9 skill(s) available
+      /rulekitx-premium-ui
+      ...
+
+  Layer 3 — Project Memory (project-scoped)
+    – not present (optional, run `rulekitx init --local` inside a project)
+
+  ✓ RuleKitX is ready to use!
+```
+
+### `list`
+Lists all available `/rulekitx-*` skills that you can use in prompts, grouped by category.
+
+```bash
+rulekitx list
+```
+
+### `parse`
+Simulates prompt parsing. Use this to verify which skills RuleKitX detects in a complex prompt.
+
+```bash
+rulekitx parse "/rulekitx-architect build a new feature"
+```
+
+### `compose`
+Outputs the fully assembled, XML-wrapped system prompt exactly as an LLM sees it.
+
+```bash
+rulekitx compose "/rulekitx-api create user endpoint"
+```
+
+### `completions`
+Outputs all commands and descriptions as structured data for IDE extensions.
+
+```bash
+rulekitx completions
+```
+
+**Options:**
+*   `--format <format>`: Output format, either `json` or `plain`. Default is `json`.

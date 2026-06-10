@@ -1,0 +1,110 @@
+---
+title: System Architecture
+description: Learn how RuleKitX leverages a 3-layer memory architecture, dynamic template discovery, and structured XML tags to direct AI coding assistants efficiently.
+order: 4
+---
+
+# System Architecture
+
+RuleKitX is engineered around three major concepts: **3-Layer Memory Architecture**, **dynamic filesystem template discovery**, and **bulletproof XML orchestration**.
+
+---
+
+| Layer | What it is | When it loads |
+|---|---|---|
+| **Layer 1: Core Memory** | A small, always-on reasoning + safety kernel (`core.md`). | Always. |
+| **Layer 2: Domain Skills** | Focused skills (api, architect, premium-ui, ...). Each owns ONE concern. | On demand — only when the prompt is relevant to that skill. |
+| **Layer 3: Project Memory** | Project-scoped context: stack, architecture, conventions, business rules (`.rulekitx/project-memory.md`). | Always, for that project. Auto-detected from your repo, then you fill in the rest. |
+
+---
+
+## 1. 3-Layer Memory Architecture
+
+To prevent context bloat and minimize token waste, RuleKitX structures prompt rules into three decoupled layers of cognitive memory. Instead of loading every rule for every query, only the rules relevant to your active task are injected.
+
+```
++---------------------------------------------------------------+
+|                    USER PROMPT & TASK                         |
++---------------------------------------------------------------+
+                                ↓
++---------------------------------------------------------------+
+|               LAYER 1: CORE MEMORY (Always-On)                |
+|             Reasoning floors, safety baselines                |
++---------------------------------------------------------------+
+         ↓                                              ↓
++-------------------------------+    +--------------------------+
+|  LAYER 2: DOMAIN SKILLS       |    | LAYER 3: PROJECT MEMORY  |
+|  (On-Demand / Model-Selected) |    | (Always-On / Local)      |
+|  api, ui, safe-feature, etc.  |    | Tech stack & conventions |
++-------------------------------+    +--------------------------+
+         ↓                                              ↓
++---------------------------------------------------------------+
+|                  COMPOSED SYSTEM CONTEXT                      |
++---------------------------------------------------------------+
+```
+
+### Layer 1: Core Memory (Universal reasoning & safety floor)
+The foundational floor. Always active and never domain-specific. Defines universal stop-gaps, reasoning priorities, safely modifying principles, and security baselines. 
+
+### Layer 2: Domain Skills (On-demand context-selected specialist logic)
+Targeted specialist guidelines. Each domain skill owns exactly **one concern** (e.g. `api-standard` handles HTTP contracts, while `premium-ui` handles accessible interface components). These are model-selected or explicitly invoked via slash commands — never globally bloated.
+
+### Layer 3: Project Memory (Project-scoped, always-on context)
+Saves the specific repository context. Keeps the actual tech stack, tooling definitions, architecture choices, and business policies in place so the AI agent stops guessing your runtime or inventing libraries. Generated locally via dependency autodetection.
+
+---
+
+## 2. Per-IDE & Agent Delivery
+
+Each coding tool manages context and rules differently. RuleKitX adaptively translates your rules to match the strengths of each platform:
+
+*   **Cursor:** Native background compliance with no `.mdc` file bloat. Core and Project Memory rules use `alwaysApply: true` so they are automatically loaded everywhere in the workspace. Domain skills use description-only frontmatter (without global globs) so they function as Agent-Requested, loaded strictly when relevant to your prompt.
+*   **OpenCode & Claude Code:** Skill bodies are kept skill-only (removing 10x embedded-core duplication). Core rules (and Project Memory rules, if local) are injected as a marker-delimited managed block into the always-loaded files (`CLAUDE.md` / `AGENTS.md`) between `<!-- RULEKITX:START -->` and `<!-- RULEKITX:END -->` tags.
+*   **VS Code & JetBrains:** Accessible globally via autocomplete live snippets (e.g. typing `/rulekitx-architect` triggers the snippet block). Missing IDE installation folders are skipped silently during setup.
+
+---
+
+## 3. Dynamic Discovery
+
+Traditional prompt managers hardcode text snippets in source code files. RuleKitX utilizes a dynamic filesystem-based template model:
+
+1. **Source of Truth:** All rules are written in raw, legible Markdown files under `templates/` inside the package.
+2. **First-Time Provisioning:** Running `rulekitx init` copies templates into your user config folder (`~/.rulekitx/`).
+3. **Parsing Frontmatter:** The loader dynamically parses YAML headers to extract command metadata:
+   ```yaml
+   ---
+   name: architect
+   description: Design scalable, maintainable system architectures
+   ---
+   ```
+4. **Instant Updates:** Editing any file in your local `~/.rulekitx/` instantly updates all global snippets, OpenCode configs, and Claude skills without editing rulekitx source code.
+
+---
+
+## 4. Bulletproof XML Containers
+
+Modern LLMs (like GPT-4o, Claude 3.5 Sonnet, and Gemini Pro) are heavily trained on structured XML tags. RuleKitX leverages this behavior to build a strict system envelope.
+
+By wrapping prompts in structural tags, models are highly discouraged from outputting incomplete code, hiding TODOs, or bypassing security audits:
+
+```xml
+<RULEKITX_SYSTEM_PROMPT version="2.0" priority="MAXIMUM">
+  <MANDATORY_INSTRUCTIONS>
+    Rules are NON-NEGOTIABLE and override default behaviors...
+  </MANDATORY_INSTRUCTIONS>
+
+  <CORE_RULES priority="CRITICAL">
+    <!-- Foundational Layer 1 Core rules -->
+  </CORE_RULES>
+
+  <ACTIVE_SKILLS>
+    <!-- Combined active skills loaded dynamically -->
+  </ACTIVE_SKILLS>
+
+  <COMPLIANCE_CHECK>
+    Verify you applied core floor guidelines before replying...
+  </COMPLIANCE_CHECK>
+</RULEKITX_SYSTEM_PROMPT>
+```
+
+This format isolates guidelines from the user's task text, preventing **Prompt Leakage** and **Lazy Coding** bypasses.
